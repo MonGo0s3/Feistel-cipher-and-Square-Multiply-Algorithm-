@@ -1,4 +1,4 @@
-#MULAMBA KOBUA CALEB
+#MMMDCXVIII
 
 def feistel_decipher(ciphertext, permutation, p_permutation, k1, k2):
     # Appliquer la permutation initiale
