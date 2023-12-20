@@ -1,4 +1,4 @@
-#MULAMBA KOBUA CALEB
+#MMMDCXVIII
 
 def generate_subkeys(key, permutation, left_shift, right_shift):
     # Appliquer la fonction de permutation
