@@ -1,46 +1,73 @@
 #MMMDCXVIII
+ 
+def feistel_decipher(C, permutation, left_shift_amount, right_shift_amount, k1, k2):
+    # Appliquer la permutation π
+    permuted_C = permute(C, permutation)
 
-def feistel_decipher(ciphertext, permutation, p_permutation, k1, k2):
-    # Appliquer la permutation initiale
-    permuted_ciphertext = permute(ciphertext, permutation)
-    
-    # Diviser le bloc en deux sous-blocs de 4 bits
-    g2 = permuted_ciphertext[:4]
-    d2 = permuted_ciphertext[4:]
-    
-    # Premier round
-    g1 = xor(p_permute(d2, p_permutation), k2)
-    d1 = xor(g2, or_operation(g1, k2))
-    
-    # Deuxième round
-    g0 = xor(p_permute(d1, p_permutation), k1)
-    d0 = xor(g1, or_operation(g0, k1))
-    
-    # Concaténer les sous-blocs
-    plaintext = g0 + d0
-    
-    # Appliquer l'inverse de la permutation initiale
-    plaintext = permute(plaintext, inverse_permutation(permutation))
-    
-    return plaintext
+    # Diviser C en deux blocs de 4 bits
+    G2 = permuted_C[:4]
+    D2 = permuted_C[4:]
+
+    # Premier Round
+    G1 = xor(inverse_permute(D2, [2, 0, 1, 3]), k2)
+    D1 = xor(G2, or_operation(G1, k2))
+
+    # Deuxième Round
+    G0 = xor(inverse_permute(D1, [2, 0, 1, 3]), k1)
+    D0 = xor(G1, or_operation(G0, k1))
+
+    # Concaténation des résultats
+    N = G0 + D0
+
+    # Appliquer l'inverse de la permutation π^(-1)
+    decrypted_text = permute(N, inverse_permute(N, permutation))
+
+    return decrypted_text
+
+def permute(block, permutation):
+    # Appliquer la permutation à un bloc
+    permuted_block = [block[i] for i in permutation]
+
+    return permuted_block
+
+def inverse_permute(block, permutation):
+    # Appliquer l'inverse de la permutation à un bloc
+    inverse_permuted_block = [0] * len(block)
+    for i, j in enumerate(permutation):
+        inverse_permuted_block[j] = block[i]
+
+    return inverse_permuted_block
+
+def xor(block1, block2):
+    # Appliquer l'opération XOR entre deux blocs
+    result = [bit1 ^ bit2 for bit1, bit2 in zip(block1, block2)]
+
+    return result
+
+def or_operation(block1, block2):
+    # Appliquer l'opération OR entre deux blocs
+    result = [bit1 | bit2 for bit1, bit2 in zip(block1, block2)]
+
+    return result
 
 # Interaction avec l'utilisateur pour obtenir les données d'entrée
-ciphertext = input("Entrez le texte chiffré binaire de longueur 8 : ")
-ciphertext = [int(bit) for bit in ciphertext]  # Convertir le texte chiffré en une liste d'entiers
+C = input("Entrez le bloc C binaire de longueur 8 : ")
+C = [int(bit) for bit in C]  # Convertir le bloc C en une liste d'entiers
 
 permutation = input("Entrez la permutation de longueur 8 (indices séparés par des espaces) : ")
 permutation = [int(index) for index in permutation.split()]  # Convertir la permutation en une liste d'entiers
 
-p_permutation = [2, 0, 1, 3]  # Permutation P
+left_shift_amount = int(input("Entrez l'ordre du décalage à gauche : "))
+right_shift_amount = int(input("Entrez l'ordre du décalage à droite : "))
 
-k1 = input("Entrez la sous-clé k1 de longueur 4 : ")
-k1 = [int(bit) for bit in k1]  # Convertir la sous-clé en une liste d'entiers
+k1 = input("Entrez la sous-clé k1 binaire de longueur 4 : ")
+k1 = [int(bit) for bit in k1]  # Convertir la sous-clé k1 en une liste d'entiers
 
-k2 = input("Entrez la sous-clé k2 de longueur 4 : ")
-k2 = [int(bit) for bit in k2]  # Convertir la sous-clé en une liste d'entiers
+k2 = input("Entrez la sous-clé k2 binaire de longueur 4 : ")
+k2 = [int(bit) for bit in k2]  # Convertir la sous-clé k2 en une liste d'entiers
 
 # Déchiffrement de Feistel
-plaintext = feistel_decipher(ciphertext, permutation, p_permutation, k1, k2)
+decrypted_text = feistel_decipher(C, permutation, left_shift_amount, right_shift_amount, k1, k2)
 
 # Affichage du texte clair
-print(f"Texte clair : {plaintext}")
+print("Le texte clair est :", decrypted_text)
